@@ -52,19 +52,29 @@ username = ENV['AE_USERNAME'] || abort('AE_USERNAME not set')
 password = ENV['AE_PASSWORD'] || abort('AE_PASSWORD not set')
 influx_hostname = ENV['INFLUXDB_HOSTNAME'] || abort('INFLUXDB_HOSTNAME not set')
 influx_database = ENV['INFLUXDB_DATABASE'] || abort('INFLUXDB_DATABASE not set')
+once = ENV['ONCE']
 
 ae = AmberElectric.new(username, password)
-price_list = ae.price_list
-
 influxdb = InfluxDB::Client.new(influx_database, host: influx_hostname)
 
-data = [
-  {
-    series: 'live',
-    values: { price: price_list['currentPriceKWH'], renewables: price_list['currentRenewableInGrid'], colour: price_list['currentPriceColor']},
-    timestamp: Time.iso8601(price_list['currentPricePeriod'].sub(/Z$/, '')).to_i
-  },
-]
+loop do
+  price_list = ae.price_list
 
-ap data
-influxdb.write_points(data)
+  data = [
+    {
+      series: 'live',
+      values: { price: price_list['currentPriceKWH'], renewables: price_list['currentRenewableInGrid'], colour: price_list['currentPriceColor'] },
+      timestamp: Time.iso8601(price_list['currentPricePeriod'].sub(/Z$/, '')).to_i
+    },
+  ]
+
+  influxdb.write_points(data)
+
+  if once
+    ap data
+    ap usage
+    exit
+  end
+
+  sleep 300
+end
