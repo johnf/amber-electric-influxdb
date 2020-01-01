@@ -80,7 +80,7 @@ class AmberElectric
         type: usage['usageType'],
         cost: usage['usageCost'],
         kWH: usage['usageKWH'] * multiplier,
-        average_price: usage['usageAveragePrice'],
+        # average_price: usage['usageAveragePrice'],
         price_spikes: usage['usagePriceSpikes'],
         daily_fixed_cost: usage['dailyFixedCost'],
       },
