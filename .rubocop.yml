@@ -1,0 +1,37 @@
+Style/Documentation:
+  Enabled: false
+
+# Style/Lambda:
+#  Enabled: false
+
+Style/TrailingComma:
+  EnforcedStyleForMultiline: comma
+
+Metrics/LineLength:
+  Max: 120
+
+# Metrics/MethodLength:
+#   Max: 40
+
+# Metrics/AbcSize:
+#   Max: 40
+
+# Metrics/CyclomaticComplexity:
+#   Max: 10
+
+# Metrics/ClassLength:
+#   Max: 200
+
+# AlignHash:
+#   EnforcedHashRocketStyle: table
+
+# AllCops:
+#   RunRailsCops: true
+#   Include:
+#     - '**/Rakefile'
+#     - '**/Gemfile'
+#   Exclude:
+#     - 'db/**/*'
+#     - 'config/**/*'
+#     - 'log/**/*'
+#     - 'vendor/**/*'
