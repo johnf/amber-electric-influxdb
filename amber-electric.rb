@@ -63,7 +63,11 @@ loop do
   data = [
     {
       series: 'live',
-      values: { price: price_list['currentPriceKWH'], renewables: price_list['currentRenewableInGrid'], colour: price_list['currentPriceColor'] },
+      values: {
+        price: price_list['currentPriceKWH'],
+        renewables: price_list['currentRenewableInGrid'],
+        colour: price_list['currentPriceColor']
+      },
       timestamp: Time.iso8601(price_list['currentPricePeriod'].sub(/Z$/, '')).to_i
     },
   ]
