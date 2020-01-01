@@ -27,31 +27,68 @@ class AmberElectric
   end
 
   def run
-    price_list = fetch_price_list
 
     loop do
-      data = [
-        {
-          series: 'live',
-          values: {
-            price: price_list['currentPriceKWH'],
-            renewables: price_list['currentRenewableInGrid'],
-            colour: price_list['currentPriceColor']
-          },
-          timestamp: Time.iso8601(price_list['currentPricePeriod'].sub(/Z$/, '')).to_i
-        },
-      ]
+      data = []
+
+      price_list = fetch_price_list
+      usage = fetch_usage
+
+      data << generate_price_list(price_list)
+
+      (usage['lastWeekDailyUsage'] + usage['thisWeekDailyUsage']).each do |day|
+        data << generate_usage(day)
+      end
 
       influxdb.write_points(data)
 
       if once
-        ap usage
+        ap data
         exit
       end
 
       sleep 300
     end
   end
+
+  def generate_price_list(price_list)
+    {
+      series: 'live',
+      values: {
+        price: price_list['currentPriceKWH'],
+        renewables: price_list['currentRenewableInGrid'],
+        colour: price_list['currentPriceColor']
+      },
+      timestamp: timestamp(price_list['currentPricePeriod']),
+    }
+  end
+
+  def generate_usage(usage)
+    case usage['meterSuffix']
+    when 'B1'
+      type = 'solar'
+      multiplier = -1
+    when 'E1'
+      type = 'grid'
+      multiplier = 1
+    else
+      raise 'Unknown meter'
+    end
+    {
+      series: 'usage',
+      values: {
+        type: usage['usageType'],
+        cost: usage['usageCost'],
+        kWH: usage['usageKWH'] * multiplier,
+        average_price: usage['usageAveragePrice'],
+        price_spikes: usage['usagePriceSpikes'],
+        daily_fixed_cost: usage['dailyFixedCost'],
+      },
+      tags: { type: type },
+      timestamp: timestamp(usage['date']),
+    }
+  end
+
 
   def fetch_price_list
     options = {
@@ -62,13 +99,17 @@ class AmberElectric
     result['data']
   end
 
-  def usage
-    options = {
-    }
-    result = self.class.post('/UsageHub/GetUsageForHub', options).parsed_response
+  def fetch_usage
+    result = self.class.post('/UsageHub/GetUsageForHub').parsed_response
     raise 'Could not fetch usage' unless result['serviceResponseType'] == 1
 
     result['data']
+  end
+
+  def timestamp(stamp)
+    localtime = stamp.sub(/Z$/, '')
+
+    Time.iso8601(localtime).to_i
   end
 
   private
@@ -90,8 +131,3 @@ class AmberElectric
 end
 
 AmberElectric.new.run
-# Gran data from environment
-#
-# usage = ae.usage
-# usage['thisWeekDailyUsage'].each do |day|
-# end
