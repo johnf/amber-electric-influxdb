@@ -27,7 +27,6 @@ class AmberElectric
   end
 
   def run
-
     loop do
       data = []
 
@@ -40,12 +39,22 @@ class AmberElectric
         data << generate_usage(day)
       end
 
-      influxdb.write_points(data)
-
       if once
+        puts 'Price List'
+        ap price_list
+        puts
+
+        puts 'Usage'
+        ap usage
+        puts
+
+        puts 'Data'
         ap data
+        puts
         exit
       end
+
+      influxdb.write_points(data)
 
       sleep 300
     end
