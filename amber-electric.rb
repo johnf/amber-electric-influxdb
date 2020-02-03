@@ -112,6 +112,11 @@ class AmberElectric
     result = self.class.post('/UsageHub/GetUsageForHub').parsed_response
     raise 'Could not fetch usage' unless result['serviceResponseType'] == 1
 
+    if result['data'].nil?
+      $stderr.puts "No usage data received: #{result['message']}"
+      return { 'lastWeekDailyUsage': [], 'thisWeekDailyUsage': [] }
+    end
+
     result['data']
   end
 
