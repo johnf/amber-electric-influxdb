@@ -6,7 +6,7 @@ influxdb.
 
 ## Config
 
-You need to ste the following variables
+You need to set the following variables
 
 ```bash
 # Required
@@ -18,10 +18,36 @@ INFLUXDB_HOSTNAME=influxdb
 INFLUXDB_DATABASE=amber_electric
 ```
 
-## Publishing new Image
+## Development
 
 ``` bash
+# Build
 docker build -t amber-electric-influxdb .
-docker tag amber-electric-influxdb johnf/amber-electric-influxdb
-docker push johnf/amber-electric-influxdb
+
+# Configure a direnv .envrc with all the variables
+
+# Test
+docker run -it \
+  -e AE_USERNAME="$AE_USERNAME" \
+  -e AE_PASSWORD="$AE_PASSWORD" \
+  -e INFLUXDB_HOSTNAME="$INFLUXDB_HOSTNAME" \
+  -e INFLUXDB_DATABASE="$INFLUXDB_HOSTNAME" \
+  -e ONCE=true \
+  amber-electric-influxdb
+
+```
+
+## Release
+
+``` bash
+# Update the change log
+vi CHANGELOG.md
+
+# Create a release
+hub release create --browse v1.0.0
+
+# Import the changelog
+:r CHANGELOG.md
+
+# Check Github Actions
 ```
