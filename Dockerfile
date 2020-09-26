@@ -1,4 +1,4 @@
-FROM ruby:2.5
+FROM ruby:2.7
 
 ENV INFLUXDB_HOSTNAME influxdb
 ENV INFLUXDB_DATABASE amber_electric
