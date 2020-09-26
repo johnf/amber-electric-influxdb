@@ -8,6 +8,6 @@ gem 'httparty'
 gem 'influxdb'
 
 group :development do
+  gem 'amazing_print'
   gem 'rubocop'
-  gem 'awesome_print'
 end

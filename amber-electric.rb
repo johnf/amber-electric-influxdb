@@ -4,10 +4,11 @@
 require 'httparty'
 require 'influxdb'
 
-require 'awesome_print'
+require 'amazing_print'
 
 class AmberElectric
   include HTTParty
+
   headers 'Content-Type' => 'application/json'
   base_uri 'https://api-bff.amberelectric.com.au/api/v1.0'
   # debug_output
