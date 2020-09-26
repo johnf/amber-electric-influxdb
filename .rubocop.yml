@@ -1,37 +1,21 @@
+AllCops:
+  NewCops: enable
+
 Style/Documentation:
   Enabled: false
 
-# Style/Lambda:
-#  Enabled: false
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
 
-Style/TrailingComma:
-  EnforcedStyleForMultiline: comma
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
-# Metrics/MethodLength:
-#   Max: 40
+Metrics/MethodLength:
+  Max: 32
 
-# Metrics/AbcSize:
-#   Max: 40
+Metrics/ClassLength:
+  Max: 120
 
-# Metrics/CyclomaticComplexity:
-#   Max: 10
-
-# Metrics/ClassLength:
-#   Max: 200
-
-# AlignHash:
-#   EnforcedHashRocketStyle: table
-
-# AllCops:
-#   RunRailsCops: true
-#   Include:
-#     - '**/Rakefile'
-#     - '**/Gemfile'
-#   Exclude:
-#     - 'db/**/*'
-#     - 'config/**/*'
-#     - 'log/**/*'
-#     - 'vendor/**/*'

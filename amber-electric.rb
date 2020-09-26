@@ -39,20 +39,7 @@ class AmberElectric
         data << generate_usage(day)
       end
 
-      if once
-        puts 'Price List'
-        ap price_list
-        puts
-
-        puts 'Usage'
-        ap usage
-        puts
-
-        puts 'Data'
-        ap data
-        puts
-        exit
-      end
+      print_data(price_list, usage, data) if once
 
       influxdb.write_points(data)
 
@@ -66,7 +53,7 @@ class AmberElectric
       values: {
         price: price_list['currentPriceKWH'],
         renewables: price_list['currentRenewableInGrid'],
-        colour: price_list['currentPriceColor']
+        colour: price_list['currentPriceColor'],
       },
       timestamp: timestamp(price_list['currentPricePeriod']),
     }
@@ -83,6 +70,7 @@ class AmberElectric
     else
       raise 'Unknown meter'
     end
+
     {
       series: 'usage',
       values: {
@@ -98,7 +86,6 @@ class AmberElectric
     }
   end
 
-
   def fetch_price_list
     options = {
     }
@@ -113,7 +100,7 @@ class AmberElectric
     raise 'Could not fetch usage' unless result['serviceResponseType'] == 1
 
     if result['data'].nil?
-      $stderr.puts "No usage data received: #{result['message']}"
+      warn "No usage data received: #{result['message']}"
       return { 'lastWeekDailyUsage': [], 'thisWeekDailyUsage': [] }
     end
 
@@ -132,8 +119,8 @@ class AmberElectric
     options = {
       body: {
         username: username,
-        password: password
-      }.to_json
+        password: password,
+      }.to_json,
     }
 
     result = self.class.post('/Authentication/SignIn', options).parsed_response
@@ -141,6 +128,21 @@ class AmberElectric
 
     self.class.headers 'authorization' => result['data']['idToken']
     self.class.headers 'refreshtoken' => result['data']['refreshToken']
+  end
+
+  def print_data(price_list, usage, data)
+    puts 'Price List'
+    ap price_list
+    puts
+
+    puts 'Usage'
+    ap usage
+    puts
+
+    puts 'Data'
+    ap data
+    puts
+    exit
   end
 end
 
