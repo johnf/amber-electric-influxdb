@@ -11,7 +11,7 @@ class AmberElectric
 
   headers 'Content-Type' => 'application/json'
   base_uri 'https://api-bff.amberelectric.com.au/api/v1.0'
-  # debug_output
+  debug_output if ENV['AMBER_DEBUG']
 
   attr_reader :influxdb, :once
 
