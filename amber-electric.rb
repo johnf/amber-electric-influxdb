@@ -10,7 +10,7 @@ class AmberElectric
   include HTTParty
 
   headers 'Content-Type' => 'application/json'
-  base_uri 'https://api-bff.amberelectric.com.au/api/v1.0'
+  base_uri 'https://api.amber.com.au/v1'
   debug_output if ENV['AMBER_DEBUG']
 
   attr_reader :influxdb, :once
@@ -22,9 +22,9 @@ class AmberElectric
     influx_database = ENV['INFLUXDB_DATABASE'] || abort('INFLUXDB_DATABASE not set')
     @influxdb = InfluxDB::Client.new(influx_database, host: influx_hostname)
 
-    username = ENV['AE_USERNAME'] || abort('AE_USERNAME not set')
-    password = ENV['AE_PASSWORD'] || abort('AE_PASSWORD not set')
-    login(username, password)
+    token = ENV['AE_TOKEN'] || abort('AE_TOKEN not set')
+
+    self.class.headers 'Authorization' => "Bearer #{token}"
   end
 
   def run
@@ -90,14 +90,14 @@ class AmberElectric
   def fetch_price_list
     options = {
     }
-    result = self.class.post('/Price/GetPriceList', options).parsed_response
+    result = post('/Price/GetPriceList', options)
     raise 'Could not fetch price list' unless result['serviceResponseType'] == 1
 
     result['data']
   end
 
   def fetch_usage
-    result = self.class.post('/UsageHub/GetUsageForHub').parsed_response
+    result = post('/UsageHub/GetUsageForHub')
     raise 'Could not fetch usage' unless result['serviceResponseType'] == 1
 
     if result['data'].nil?
@@ -114,21 +114,18 @@ class AmberElectric
     Time.iso8601(localtime).to_i
   end
 
+  def sites
+    get('/sites')
+  end
+
   private
 
-  def login(username, password)
-    options = {
-      body: {
-        username: username,
-        password: password,
-      }.to_json,
-    }
+  def post(url, options = {})
+    self.class.post(url, options).parsed_response
+  end
 
-    result = self.class.post('/Authentication/SignIn', options).parsed_response
-    raise 'Authentication Failed' unless result['serviceResponseType'] == 1
-
-    self.class.headers 'authorization' => result['data']['idToken']
-    self.class.headers 'refreshtoken' => result['data']['refreshToken']
+  def get(url, options = {})
+    self.class.get(url, options).parsed_response
   end
 
   def print_data(price_list, usage, data)
